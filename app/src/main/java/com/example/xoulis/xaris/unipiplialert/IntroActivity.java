@@ -1,9 +1,10 @@
 package com.example.xoulis.xaris.unipiplialert;
 
-import android.graphics.drawable.Drawable;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -36,22 +37,12 @@ public class IntroActivity extends AppIntro implements TextWatcher {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Hide the status bar.
-        hideStatusBar();
-        // Hide, also, the action bar.
-        hideActionBar();
-
         addSlide(SampleSlide.newInstance(R.layout.slide1));
         addSlide(SampleSlide.newInstance(R.layout.slide2));
         addSlide(SampleSlide.newInstance(R.layout.slide3));
 
         showSkipButton(false);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        hideStatusBar();
+        setSeparatorColor(Color.TRANSPARENT);
     }
 
     @Override
@@ -71,23 +62,15 @@ public class IntroActivity extends AppIntro implements TextWatcher {
             addTextChangeListeners();
 
             // Set default text for contacts editTexts
-            String defaultText = "+" + GetCountryCodeNumber.getCallCode(this);
-            contact1EditText.setText(defaultText);
-            contact2EditText.setText(defaultText);
+            setDefaultTextForContactsFields();
         }
 
     }
 
-    private void hideStatusBar() {
-        View decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
-    }
-
-    private void hideActionBar() {
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
+    @Override
+    public void onDonePressed(Fragment currentFragment) {
+        super.onDonePressed(currentFragment);
+        finish();
     }
 
     private void initViews() {
@@ -110,9 +93,20 @@ public class IntroActivity extends AppIntro implements TextWatcher {
         contact2EditText.addTextChangedListener(this);
     }
 
+
+    // TODO Check for 1-digit, 3-digits country codes!!
+    private void setDefaultTextForContactsFields() {
+        String defaultText = "+" + GetCountryCodeNumber.getCallCode(this);
+        contact1EditText.setText(defaultText);
+        contact2EditText.setText(defaultText);
+
+        // Move the cursor
+        contact1EditText.setSelection(2);
+        contact2EditText.setSelection(2);
+    }
+
     @Override
     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
     }
 
     @Override
@@ -181,7 +175,7 @@ public class IntroActivity extends AppIntro implements TextWatcher {
 
         if (contactNo == 1) {
             if (!editable.toString().startsWith("+")) {
-                temp = contact2EditText.getText().toString();
+                temp = contact1EditText.getText().toString();
                 newText = "+" + temp;
                 contact1EditText.setText(newText);
             }
@@ -194,19 +188,24 @@ public class IntroActivity extends AppIntro implements TextWatcher {
         }
     }
 
+    // TODO Check for 1-digit, 3-digits country codes!!
     private void inputHasThirteenDigits(int contactNo) {
         if (contactNo == 1) {
-            if (contact1EditText.getText().length() != 13) {
-                contact1TextInputLayout.setError(getString(R.string.contact1_text_input_layout_error_message));
+            if (contact1EditText.getText().length() < 3) {
+                contact1TextInputLayout.setError(getString(R.string.contact_without_country_code_error_message));
                 contact1IsValid = false;
+            } else if (contact1EditText.getText().length() < 13) {
+                contact1TextInputLayout.setError(getString(R.string.contact_with_country_code_error_message));
             } else {
                 contact1TextInputLayout.setError(null);
                 contact1IsValid = true;
             }
         } else {
-            if (contact2EditText.getText().length() != 13) {
-                contact2TextInputLayout.setError(getString(R.string.contact2_text_input_layout_error_message));
+            if (contact2EditText.getText().length() < 3) {
+                contact2TextInputLayout.setError(getString(R.string.contact_without_country_code_error_message));
                 contact2IsValid = false;
+            } else if (contact2EditText.getText().length() < 13) {
+                contact2TextInputLayout.setError(getString(R.string.contact_with_country_code_error_message));
             } else {
                 contact2TextInputLayout.setError(null);
                 contact2IsValid = true;
@@ -218,5 +217,6 @@ public class IntroActivity extends AppIntro implements TextWatcher {
         boolean enableButton = usernameIsValid && passIsValid
                 && contact1IsValid && contact2IsValid;
         saveButton.setEnabled(enableButton);
+        if (enableButton) saveButton.setAlpha(1f);
     }
 }

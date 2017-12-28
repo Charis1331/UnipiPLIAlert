@@ -6,4 +6,7 @@
     <color name="colorPrimaryLight">#D1C4E9</color>
 
     <color name="textColor">#FFFFFF</color>
+
+    <!-- For disabled button (opacity = 0.2)-->
+    <color name="disabledButtonColor">#20FFFFFF</color>
 </resources>

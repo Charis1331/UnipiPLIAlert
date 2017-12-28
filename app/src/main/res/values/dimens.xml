@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- For all the views -->
+    <dimen name="marginEnd">16dp</dimen>
+    <dimen name="marginStart">16dp</dimen>
+    <dimen name="marginTop">0dp</dimen>
+
+    <!-- Title TextView -->
+    <dimen name="titleMarginTop">0dp</dimen>
+
+    <!-- Username EditText -->
+    <dimen name="usernameMarginTop">0dp</dimen>
+
+    <!-- Save Button -->
+    <dimen name="saveButtonMarginTop">0dp</dimen>
+</resources>

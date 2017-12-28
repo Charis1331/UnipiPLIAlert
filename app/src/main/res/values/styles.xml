@@ -8,14 +8,21 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="Theme.AppCompat.Light.NoActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="Theme.AppCompat.Light" />
+    <style name="IntroActivityTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
 
     <!-- Style for TextInputLayout error -->
     <style name="error_appearance" parent="@android:style/TextAppearance">
         <item name="android:textColor">@color/textColor</item>
         <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="button" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="android:alpha">0.2</item>
     </style>
 
 </resources>
