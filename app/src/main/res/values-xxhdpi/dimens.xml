@@ -4,22 +4,21 @@
     <dimen name="sidewaysMarginS1">24dp</dimen>
     <dimen name="topTextViewMarginTopS1">32dp</dimen>
     <dimen name="bottomTextViewMarginTopS1">16dp</dimen>
-    <dimen name="imageMarginTopS1">32dp</dimen>
+    <dimen name="imageMarginTopS1">16dp</dimen>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
     <!-- SLIDE3 -->
     <!-- For all the views -->
-    <dimen name="sidewaysMarginS3">16dp</dimen>
-    <dimen name="marginTopS3">0dp</dimen>
+    <dimen name="sidewaysMarginS3">24dp</dimen>
+    <dimen name="marginTopS3">16dp</dimen>
 
     <!-- Title TextView -->
-    <dimen name="titleMarginTopS3">0dp</dimen>
+    <dimen name="titleMarginTopS3">32dp</dimen>
 
     <!-- Username EditText -->
-    <dimen name="usernameMarginTopS3">0dp</dimen>
+    <dimen name="usernameMarginTopS3">24dp</dimen>
 
     <!-- Save Button -->
-    <dimen name="saveButtonMarginTopS3">0dp</dimen>
-
+    <dimen name="saveButtonMarginTopS3">8dp</dimen>
 </resources>

@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- SLIDE1 -->
+    <dimen name="sidewaysMarginS1">24dp</dimen>
+    <dimen name="topTextViewMarginTopS1">32dp</dimen>
+    <dimen name="bottomTextViewMarginTopS1">16dp</dimen>
+    <dimen name="imageMarginTopS1">16dp</dimen>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+    <!-- SLIDE3 -->
     <!-- For all the views -->
-    <dimen name="marginEnd">24dp</dimen>
-    <dimen name="marginStart">24dp</dimen>
-    <dimen name="marginTop">16dp</dimen>
+    <dimen name="sidewaysMarginS3">24dp</dimen>
+    <dimen name="marginTopS3">16dp</dimen>
 
     <!-- Title TextView -->
-    <dimen name="titleMarginTop">16dp</dimen>
+    <dimen name="titleMarginTopS3">16dp</dimen>
 
     <!-- Username EditText -->
-    <dimen name="usernameMarginTop">16dp</dimen>
+    <dimen name="usernameMarginTopS3">16dp</dimen>
 
     <!-- Save Button -->
-    <dimen name="saveButtonMarginTop">8dp</dimen>
+    <dimen name="saveButtonMarginTopS3">8dp</dimen>
 </resources>

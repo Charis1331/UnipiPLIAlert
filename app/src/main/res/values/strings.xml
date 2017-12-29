@@ -6,10 +6,8 @@
 
     <!-- Slide1 -->
     <string name="top_text">Are you in danger? \n Do not worry anymore!</string>
-    <!-- TODO Decide what to do with this long string -->
-    <string name="bottom_text"> <b>UnipiPLIAlert</b> is here for you!! Either you feel unsafe or something
-        bad happened to you, do not worry!! If we perceive a sudden drop of
-    your device, we will immediately notify your closest contacts.</string>
+    <string name="bottom_text"> <b>UnipiPLIAlert</b> is here for you!! In an emergency,
+        <b>UnipiPLIAlert</b> will automatically (or manually) call for help.</string>
     <string name="image_view_content_description">SOS image</string>
 
     <!-- Slide3 -->
@@ -23,8 +21,7 @@
     <!-- Error messages in Slide3 -->
     <string name="username_text_input_layout_error_message">Username must be at least 4 characters!</string>
     <string name="password_text_input_layout_error_message">Password must be at least 4 characters!</string>
-    <string name="contact_without_country_code_error_message">Insert country code and tel. number!</string>
-    <string name="contact_with_country_code_error_message">Tel. number must be 10 digits!</string>
+    <string name="contact_without_country_code_error_message">Insert Country Code and Tel. Number!</string>
 
 
 </resources>
