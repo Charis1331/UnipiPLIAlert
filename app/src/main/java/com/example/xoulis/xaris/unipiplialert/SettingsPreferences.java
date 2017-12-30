@@ -27,12 +27,24 @@ public class SettingsPreferences {
         editor.apply();
     }
 
+    public static String getUsername(Context context) {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return pref.getString(PREF_USERNAME, "");
+    }
+
     public static void setUsername(Context context, String username) {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = pref.edit();
 
         editor.putString(PREF_USERNAME, username);
         editor.apply();
+    }
+
+    public static String getPassowrd(Context context) {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return pref.getString(PREF_PASSWORD, "");
     }
 
     public static void setPassword(Context context, String password) {
@@ -43,12 +55,24 @@ public class SettingsPreferences {
         editor.apply();
     }
 
+    public static String getContact1(Context context) {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return pref.getString(PREF_CONTACT1, "");
+    }
+
     public static void setContact1(Context context, String contact1) {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = pref.edit();
 
         editor.putString(PREF_CONTACT1, contact1);
         editor.apply();
+    }
+
+    public static String getContact2(Context context) {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return pref.getString(PREF_CONTACT2, "");
     }
 
     public static void setContact2(Context context, String contact2) {
