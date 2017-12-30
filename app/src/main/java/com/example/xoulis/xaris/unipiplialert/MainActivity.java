@@ -5,6 +5,8 @@ import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -28,8 +30,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         // Set the Listener for the SOS button
         initListener();
 
-        Intent intent = new Intent(this, IntroActivity.class);
-        startActivity(intent);
+        // Start the Welcome Intro ONLY the first time the app launches
+        if (SettingsPreferences.getFirstTimeStart(this)) {
+            Intent intent = new Intent(this, IntroActivity.class);
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -41,6 +46,23 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 initTimer();
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_settings){
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsIntent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void initTimer() {

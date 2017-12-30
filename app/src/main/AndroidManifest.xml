@@ -21,6 +21,8 @@
             android:name=".IntroActivity"
             android:theme="@style/IntroActivityTheme" />
 
+        <activity android:name=".SettingsActivity" />
+
     </application>
 
 </manifest>

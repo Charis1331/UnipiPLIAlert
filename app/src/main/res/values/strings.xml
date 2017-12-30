@@ -23,5 +23,7 @@
     <string name="password_text_input_layout_error_message">Password must be at least 4 characters!</string>
     <string name="contact_without_country_code_error_message">Insert Country Code and Tel. Number!</string>
 
+    <!-- Settings Menu -->
+    <string name="settings_menu_item">Settings</string>
 
 </resources>
