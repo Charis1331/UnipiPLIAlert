@@ -1,23 +1,27 @@
 package com.example.xoulis.xaris.unipiplialert;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.LocationManager;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
+import android.net.Uri;
 import android.os.CountDownTimer;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.Toast;
-
-import javax.xml.datatype.Duration;
 
 
 public class MainActivity extends AppCompatActivity
@@ -25,41 +29,99 @@ public class MainActivity extends AppCompatActivity
 
     private ProgressBar progressBar;
     private Button sosButton;
+
     private CountDownTimer timer;
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private ToneGenerator toneGen;
 
     private static final int SECONDS_UNTIL_SMS = 30;
+    private static final String GOOGLE_MAPS_URI = "https://www.google.com/maps/search/";
+
+    /* ---------------------- ACTIVITY LIFECYCLE METHODS ---------------------- */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // Initialise the Views
-        initViews();
-
-        // Set the Listener for the SOS button
-        initListener();
 
         // Start the Welcome Intro ONLY the first time the app launches
         if (SettingsPreferences.getFirstTimeStart(this)) {
             Intent intent = new Intent(this, IntroActivity.class);
-            startActivity(intent);
+            // TODO
+            //startActivity(intent);
         }
 
-        SensorManager sens = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        Sensor acc = sens.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sens.registerListener(this, acc, SensorManager.SENSOR_DELAY_NORMAL);
+        // GPS
+        ConfigureGPS obj = new ConfigureGPS();
+        //obj.configureFusedLocationClient(this);
+        obj.getUserLastLocation(this);
+
+        // Initialise the Views
+        initViews();
+
+        //Initialise SensorManager and Sensors
+        initSens();
+
+        // Set the Listener for the SOS button
+        initListeners();
     }
 
     @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.sosButton) {
-            if (progressBar.getVisibility() == View.VISIBLE) {
-                stopTimer();
-            } else {
-                initTimer();
-            }
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Unregister the sensorManager
+        if (sensorManager != null) {
+            sensorManager.unregisterListener(this);
+        }
+
+        // Cancel the timer and release the ToneGenerator
+        if (timer != null) {
+            stopTimer();
+            toneGen.release();
         }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (sensorManager != null) {
+            registerSensorManager();
+        }
+    }
+
+    /* ---------------------- INITIALISATION METHODS ---------------------- */
+
+    private void initViews() {
+        progressBar = findViewById(R.id.progressBar);
+        sosButton = findViewById(R.id.sosButton);
+    }
+
+    private void initSens() {
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    }
+
+    private void initListeners() {
+        sosButton.setOnClickListener(this);
+        registerSensorManager();
+    }
+
+    private void registerSensorManager() {
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    /* ---------------------- ACTIVITY MENU ---------------------- */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -78,44 +140,82 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    /* ---------------------- COUNTDOWN TIMER ---------------------- */
+
     private void initTimer() {
         progressBar.setVisibility(View.VISIBLE);
-        String initialText = SECONDS_UNTIL_SMS + "s";
-        sosButton.setText(initialText);
+        sosButton.setText(getString(R.string.abort_text));
         startTimer(SECONDS_UNTIL_SMS);
     }
 
-    private void stopTimer() {
-        progressBar.setVisibility(View.INVISIBLE);
-        sosButton.setText(getString(R.string.button_text));
-        timer.cancel();
-    }
-
     private void startTimer(long timeInSec) {
+        // Initialise ToneGenerator
+        toneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+
         timer = new CountDownTimer(timeInSec * 1000 + 100, 1000) {
             @Override
             public void onTick(long l) {
                 int secondsLeft = (int) (l / 1000);
                 progressBar.setProgress(secondsLeft);
-                String text = secondsLeft + "s";
-                sosButton.setText(text);
+                toneGen.startTone(ToneGenerator.TONE_CDMA_HIGH_L, 150);
             }
 
             @Override
             public void onFinish() {
-                progressBar.setProgress(SECONDS_UNTIL_SMS);
+                stopTimer();
+                sendSms();
             }
         }.start();
     }
 
-    private void initViews() {
-        progressBar = findViewById(R.id.progressBar);
-        sosButton = findViewById(R.id.sosButton);
+    private void stopTimer() {
+        progressBar.setProgress(SECONDS_UNTIL_SMS);
+        progressBar.setVisibility(View.INVISIBLE);
+        sosButton.setText(getString(R.string.sos_button_text));
+        timer.cancel();
+        toneGen.release();
+        registerSensorManager();
     }
-    private Toast t;
 
-    private void initListener() {
-        sosButton.setOnClickListener(this);
+    /* ---------------------- SEND SMS ---------------------- */
+
+    private void sendSms() {
+        // Get the sms manager
+        SmsManager smsManager = SmsManager.getDefault();
+
+        // Create the pending intents to control the result
+        PendingIntent pendingIntentSend = PendingIntent.getBroadcast(this, 0,
+                new Intent(Intent.ACTION_VIEW), 0);
+        PendingIntent pendingIntentDelivered = PendingIntent.getBroadcast(this, 0,
+                new Intent(Intent.ACTION_VIEW), 0);
+
+
+        Uri baseUri = Uri.parse(GOOGLE_MAPS_URI);
+        Uri.Builder builder = baseUri.buildUpon();
+
+        builder.appendQueryParameter("api", "1");
+        builder.appendQueryParameter("query", "37.888805, 23.765799");
+
+        String finalUrl = builder.toString();
+
+        smsManager.sendTextMessage("+301234567890",
+                null,
+                finalUrl,
+                pendingIntentSend,
+                pendingIntentDelivered);
+    }
+
+    /* ---------------------- LISTENERS ---------------------- */
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.sosButton) {
+            if (progressBar.getVisibility() == View.VISIBLE) {
+                stopTimer();
+            } else {
+                initTimer();
+            }
+        }
     }
 
     @Override
@@ -126,22 +226,12 @@ public class MainActivity extends AppCompatActivity
             float y = sensorEvent.values[1];
             float z = sensorEvent.values[2];
 
-            //Log.i("VALUEX",x+"");
-            //Log.i("VALUEY",y+"");
-            //Log.i("VALUEZ",z+"");
-
-            double accelerationFormula = Math.sqrt(Math.pow(x,2)
-                    + Math.pow(y,2) + Math.pow(z,2));
-
-
+            double accelerationFormula = Math.sqrt(Math.pow(x, 2)
+                    + Math.pow(y, 2) + Math.pow(z, 2));
 
             if (accelerationFormula > 20) {
-                Log.i("Value", accelerationFormula+"");
-                if (t != null){
-                    t.cancel();
-                }
-                t = Toast.makeText(this, "FALL!!", Toast.LENGTH_SHORT);
-                t.show();
+                initTimer();
+                sensorManager.unregisterListener(this);
             }
         }
     }
@@ -149,5 +239,19 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
 
+    }
+
+    /* ---------------------- PERMISSION HANDLING ---------------------- */
+    // TODO make them return true or false!s
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        HandlePermissions obj = new HandlePermissions();
+        obj.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        HandlePermissions obj = new HandlePermissions();
+        obj.onActivityResult(requestCode, resultCode, data, this);
     }
 }

@@ -2,7 +2,8 @@
     <string name="app_name">UnipiPLIAlert</string>
 
     <!-- MainActivity -->
-    <string name="button_text" translatable="false">SOS</string>
+    <string name="sos_button_text" translatable="false">SOS</string>
+    <string name="abort_text">Abort</string>
 
     <!-- Slide1 -->
     <string name="top_text">Are you in danger? \n Do not worry anymore!</string>

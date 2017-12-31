@@ -1,5 +1,6 @@
 package com.example.xoulis.xaris.unipiplialert;
 
+import android.Manifest;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -17,8 +18,12 @@ public class IntroActivity extends AppIntro {
         addSlide(SampleSlide.newInstance(R.layout.slide2));
         addSlide(SampleSlide.newInstance(R.layout.slide3));
 
+        askForPermissions(new String[]{Manifest.permission.SEND_SMS,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION}, 2);
+
         showSkipButton(false);
-        setProgressButtonEnabled(false);
+        //setProgressButtonEnabled(false);
         setSeparatorColor(Color.TRANSPARENT);
     }
 
