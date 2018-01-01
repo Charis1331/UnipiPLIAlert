@@ -35,8 +35,9 @@ public class MainActivity extends AppCompatActivity
     private Sensor accelerometer;
     private ToneGenerator toneGen;
 
+    private boolean locationPermissionWasGranted;
+
     private static final int SECONDS_UNTIL_SMS = 30;
-    private static final String GOOGLE_MAPS_URI = "https://www.google.com/maps/search/";
 
     /* ---------------------- ACTIVITY LIFECYCLE METHODS ---------------------- */
 
@@ -53,9 +54,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // GPS
-        ConfigureGPS obj = new ConfigureGPS();
-        //obj.configureFusedLocationClient(this);
-        obj.getUserLastLocation(this);
+        HandlePermissions.areLocationSettingsMet(this);
 
         // Initialise the Views
         initViews();
@@ -180,29 +179,8 @@ public class MainActivity extends AppCompatActivity
     /* ---------------------- SEND SMS ---------------------- */
 
     private void sendSms() {
-        // Get the sms manager
-        SmsManager smsManager = SmsManager.getDefault();
+        // Check for location permission
 
-        // Create the pending intents to control the result
-        PendingIntent pendingIntentSend = PendingIntent.getBroadcast(this, 0,
-                new Intent(Intent.ACTION_VIEW), 0);
-        PendingIntent pendingIntentDelivered = PendingIntent.getBroadcast(this, 0,
-                new Intent(Intent.ACTION_VIEW), 0);
-
-
-        Uri baseUri = Uri.parse(GOOGLE_MAPS_URI);
-        Uri.Builder builder = baseUri.buildUpon();
-
-        builder.appendQueryParameter("api", "1");
-        builder.appendQueryParameter("query", "37.888805, 23.765799");
-
-        String finalUrl = builder.toString();
-
-        smsManager.sendTextMessage("+301234567890",
-                null,
-                finalUrl,
-                pendingIntentSend,
-                pendingIntentDelivered);
     }
 
     /* ---------------------- LISTENERS ---------------------- */
@@ -245,8 +223,8 @@ public class MainActivity extends AppCompatActivity
     // TODO make them return true or false!s
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        HandlePermissions obj = new HandlePermissions();
-        obj.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+        locationPermissionWasGranted = HandlePermissions.
+                onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
     @Override

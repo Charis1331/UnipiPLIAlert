@@ -24,18 +24,19 @@ class ConfigureGPS {
 
     void configureFusedLocationClient(AppCompatActivity activity) {
         // Setup the location request
-        setupLocationRequest();
+        getLocationRequest();
 
         // Check for location permission
         HandlePermissions obj = new HandlePermissions();
-        obj.handleLocationPermission(activity);
     }
 
-    private void setupLocationRequest() {
+    static LocationRequest getLocationRequest() {
         locationRequest = new LocationRequest();
         locationRequest.setInterval(LOCATION_UPDATE_INTERVAL_IN_SECONDS);
         //locationRequest.setNumUpdates(1);
-        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        return locationRequest;
     }
 
     @SuppressLint("MissingPermission")

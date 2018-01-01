@@ -23,53 +23,55 @@ import com.google.android.gms.tasks.Task;
 
 class HandlePermissions {
 
+    protected static boolean locationSettingsAreMet = false;
+
     private static final int REQUEST_LOCATION_PERMISSIONS = 12;
     private static final int REQUEST_CHECK_SETTINGS = 13;
 
-    void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults, AppCompatActivity activity) {
+    static boolean onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults, AppCompatActivity activity) {
         switch (requestCode) {
             case REQUEST_LOCATION_PERMISSIONS:
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    handleCurrentLocationSetting(ConfigureGPS.locationRequest, activity);
+                    //handleCurrentLocationSetting(ConfigureGPS.locationRequest, activity);
+                    return true;
                 } else {
                     // Permission denied
-                    activity.finish();
+                    return false;
                 }
-                return;
         }
+        return false;
     }
 
     void onActivityResult(int requestCode, int resultCode, Intent data, AppCompatActivity activity) {
         if (requestCode == REQUEST_CHECK_SETTINGS) {
             if (resultCode == Activity.RESULT_OK) {
-                ConfigureGPS obj = new ConfigureGPS();
-                obj.startLocationUpdate(activity);
+                locationSettingsAreMet = true;
             } else {
                 //activity.finish();
             }
         }
     }
 
-    /* ---------------------- LOCATION PERMISSIONS ---------------------- */
+    /* ---------------------- LOCATION PERMISSIONS AND SETTINGS---------------------- */
 
-    void handleLocationPermission(AppCompatActivity activity) {
-        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(activity,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION},
-                    REQUEST_LOCATION_PERMISSIONS);
-
-        } else {
-            // Permission has already been granted, so check current location settings
-            handleCurrentLocationSetting(ConfigureGPS.locationRequest, activity);
-        }
+    static boolean hasLocationPermissionBeenGranted(AppCompatActivity activity) {
+        return (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED);
     }
 
-    private void handleCurrentLocationSetting(LocationRequest locationRequest, final AppCompatActivity activity) {
+    static void askForLocationPermission(AppCompatActivity activity) {
+        ActivityCompat.requestPermissions(activity,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION},
+                REQUEST_LOCATION_PERMISSIONS);
+    }
+
+    static void areLocationSettingsMet(final AppCompatActivity activity) {
+        // Get locationRequest
+        LocationRequest locationRequest = ConfigureGPS.getLocationRequest();
+
         // Get current location settings
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest);
@@ -81,9 +83,7 @@ class HandlePermissions {
         task.addOnSuccessListener(activity, new OnSuccessListener<LocationSettingsResponse>() {
             @Override
             public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                Log.i("HEYY", "shit");
-                ConfigureGPS obj = new ConfigureGPS();
-                obj.startLocationUpdate(activity);
+                locationSettingsAreMet = true;
             }
         });
 
@@ -92,6 +92,7 @@ class HandlePermissions {
             public void onFailure(@NonNull Exception e) {
                 if (e instanceof ResolvableApiException) {
                     // Location settings are not satisfied
+                    locationSettingsAreMet = false;
                     try {
                         // Show the dialog by calling startResolutionForResult(),
                         // and check the result in onActivityResult().
@@ -101,9 +102,9 @@ class HandlePermissions {
                     } catch (IntentSender.SendIntentException sendEx) {
                         // Ignore the error.
                     }
+
                 }
             }
         });
     }
-
 }
