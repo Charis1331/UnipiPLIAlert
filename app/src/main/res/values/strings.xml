@@ -5,6 +5,10 @@
     <string name="sos_button_text" translatable="false">SOS</string>
     <string name="abort_text">Abort</string>
 
+    <!-- SMS -->
+    <string name="sms_text_with_location">ATTENTION! I am in DANGER and I need HELP. My location is: </string>
+    <string name="sms_text_without_location">Please HELP me. I am in danger.</string>
+
     <!-- Slide1 -->
     <string name="top_text">Are you in danger? \n Do not worry anymore!</string>
     <string name="bottom_text"> <b>UnipiPLIAlert</b> is here for you!! In an emergency,

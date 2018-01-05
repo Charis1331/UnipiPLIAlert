@@ -23,25 +23,23 @@ import com.google.android.gms.tasks.Task;
 
 class HandlePermissions {
 
-    protected static boolean locationSettingsAreMet = false;
+    static boolean locationSettingsAreMet = false;
 
+    private static final int REQUEST_SMS_AND_PHONE_STATE_PERMISSIONS = 88;
     private static final int REQUEST_LOCATION_PERMISSIONS = 12;
     private static final int REQUEST_CHECK_SETTINGS = 13;
 
-    static boolean onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults, AppCompatActivity activity) {
+    static void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults, AppCompatActivity activity) {
         switch (requestCode) {
             case REQUEST_LOCATION_PERMISSIONS:
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //handleCurrentLocationSetting(ConfigureGPS.locationRequest, activity);
-                    return true;
+                    // Permission granted
                 } else {
                     // Permission denied
-                    return false;
                 }
         }
-        return false;
     }
 
     void onActivityResult(int requestCode, int resultCode, Intent data, AppCompatActivity activity) {
@@ -62,15 +60,18 @@ class HandlePermissions {
     }
 
     static void askForLocationPermission(AppCompatActivity activity) {
-        ActivityCompat.requestPermissions(activity,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION},
-                REQUEST_LOCATION_PERMISSIONS);
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION},
+                    REQUEST_LOCATION_PERMISSIONS);
+        }
     }
 
     static void areLocationSettingsMet(final AppCompatActivity activity) {
         // Get locationRequest
-        LocationRequest locationRequest = ConfigureGPS.getLocationRequest();
+        LocationRequest locationRequest = ConfigureGPS.locationRequest;
 
         // Get current location settings
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
@@ -106,5 +107,21 @@ class HandlePermissions {
                 }
             }
         });
+    }
+
+    /* ---------------------- SMS AND PHONE STATE PERMISSIONS ---------------------- */
+    static void askForSmsAndPhoneStatePermissions(AppCompatActivity activity) {
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.SEND_SMS,
+                            Manifest.permission.READ_PHONE_STATE},
+                    REQUEST_SMS_AND_PHONE_STATE_PERMISSIONS);
+        }
+    }
+
+    static boolean haveSmsAndPhoneStatePermissionsBeenGranted(AppCompatActivity activity) {
+        return ActivityCompat.checkSelfPermission(activity, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
     }
 }

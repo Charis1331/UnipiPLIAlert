@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity
 
     private boolean locationPermissionWasGranted;
 
-    private static final int SECONDS_UNTIL_SMS = 30;
+    private static final int SECONDS_UNTIL_SMS = 1;
 
     /* ---------------------- ACTIVITY LIFECYCLE METHODS ---------------------- */
 
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // GPS
-        HandlePermissions.areLocationSettingsMet(this);
+        //HandlePermissions.areLocationSettingsMet(this);
 
         // Initialise the Views
         initViews();
@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
+
         // Unregister the sensorManager
         if (sensorManager != null) {
             sensorManager.unregisterListener(this);
@@ -89,6 +90,9 @@ public class MainActivity extends AppCompatActivity
             stopTimer();
             toneGen.release();
         }
+
+        // Stop location updates
+        ConfigureGPS.stopLocationUpdates(this);
     }
 
     @Override
@@ -97,6 +101,9 @@ public class MainActivity extends AppCompatActivity
         if (sensorManager != null) {
             registerSensorManager();
         }
+
+        // Start location updates
+        ConfigureGPS.configureFusedLocationClient(this);
     }
 
     /* ---------------------- INITIALISATION METHODS ---------------------- */
@@ -180,6 +187,7 @@ public class MainActivity extends AppCompatActivity
 
     private void sendSms() {
         // Check for location permission
+        SendSMS.checkForPermissions(this);
 
     }
 
@@ -223,8 +231,7 @@ public class MainActivity extends AppCompatActivity
     // TODO make them return true or false!s
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        locationPermissionWasGranted = HandlePermissions.
-                onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+        HandlePermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
     @Override
