@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.xoulis.xaris.unipiplialert.data.EventTypes;
 
@@ -37,10 +38,16 @@ public class MainActivity extends AppCompatActivity
     private Sensor lightSensor;
     private ToneGenerator toneGen;
 
+    private AlertDialog alertDialog;
+
+    private String currentEmergency = USER_CLICK_EMERGENCY;
+
     private static final int SECONDS_UNTIL_SMS = 10;
     private static final double DANGEROUS_LUX_VALUE = 1000;
     private static final String ABORT_AFTER_FALL_DETECTED_PROCESS = "abort_after_fall_detected";
     private static final String ABORT_AFTER_USER_CLICK_PROCESS = "abort_after_user_click";
+    private static final String FALL_EMERGENCY = "fall_detected";
+    private static final String USER_CLICK_EMERGENCY = "user_clicked_sos_button";
 
     /* ---------------------- ACTIVITY LIFECYCLE METHODS ---------------------- */
 
@@ -163,11 +170,11 @@ public class MainActivity extends AppCompatActivity
 
     private void startTimer(long timeInSec) {
         // Turn up the device's volume to the max
-        /*AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.setStreamVolume(
                 AudioManager.STREAM_MUSIC,
                 audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
-                0);*/
+                0);
 
         // Initialise ToneGenerator
         toneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
@@ -182,6 +189,10 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFinish() {
+                // Hide any active Alert Dialogs
+                if (alertDialog.isShowing()) {
+                    alertDialog.dismiss();
+                }
                 stopTimer();
                 sendSms();
             }
@@ -194,7 +205,7 @@ public class MainActivity extends AppCompatActivity
         sosButton.setText(getString(R.string.sos_button_text));
         timer.cancel();
         toneGen.release();
-        registerSensorManager();
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     /* ---------------------- SEND SMS ---------------------- */
@@ -213,7 +224,12 @@ public class MainActivity extends AppCompatActivity
     public void onClick(View view) {
         if (view.getId() == R.id.sosButton) {
             if (progressBar.getVisibility() == View.VISIBLE) {
-                abortCurrentProcess(ABORT_AFTER_USER_CLICK_PROCESS);
+                if (currentEmergency.equals(FALL_EMERGENCY)) {
+                    abortCurrentProcess(ABORT_AFTER_FALL_DETECTED_PROCESS);
+                } else {
+                    currentEmergency = USER_CLICK_EMERGENCY;
+                    abortCurrentProcess(ABORT_AFTER_USER_CLICK_PROCESS);
+                }
             } else {
                 EventTypes.addEventToDb(EventTypes.SOS_BUTTON_CLICK_EVENT, this);
                 initTimer();
@@ -233,6 +249,7 @@ public class MainActivity extends AppCompatActivity
                     + Math.pow(y, 2) + Math.pow(z, 2));
 
             if (accelerationFormula > 20) {
+                currentEmergency = FALL_EMERGENCY;
                 initTimer();
                 EventTypes.addEventToDb(EventTypes.FALL_EVENT, this);
                 sensorManager.unregisterListener(this, accelerometer);
@@ -261,6 +278,7 @@ public class MainActivity extends AppCompatActivity
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        sensorManager.registerListener(MainActivity.this, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
                         dialog.dismiss();
                     }
                 });
@@ -271,43 +289,73 @@ public class MainActivity extends AppCompatActivity
     private void confirmUserInfo() {
         // Create the dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
         // Get the layout inflater
         final LayoutInflater inflater = this.getLayoutInflater();
+
         // Pass the layout
-        final View layout =  inflater.inflate(R.layout.user_info_confirmation_dialog, null);
+        final View layout = inflater.inflate(R.layout.user_info_confirmation_dialog, null);
 
         // Set the layout
         builder.setView(layout)
                 .setCancelable(false)
-                .setPositiveButton(R.string.abort_text, null);
+                .setPositiveButton(R.string.abort_text, null)
+                .setNegativeButton("Cancel", null);
 
         // Show the dialog
-        final AlertDialog alertDialog = builder.create();
+        alertDialog = builder.create();
         alertDialog.show();
 
+        // Set Listener for the buttons of the Dialog
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Find the editTexts of the alert dialog layout
                 EditText username = layout.findViewById(R.id.confirmUsernameTextView);
                 EditText password = layout.findViewById(R.id.confirmPasswordTextView);
 
-                String usernameEntered = String.valueOf(username.getText());
+                // Get their text
+                String usernameEntered = username.getText().toString();
                 String passwordEntered = password.getText().toString();
 
                 if (usernameEntered.equals(SettingsPreferences.getUsername(MainActivity.this)) &&
                         passwordEntered.equals(SettingsPreferences.getPassowrd(MainActivity.this))) {
+                    // Stop the timer
+                    stopTimer();
+
+                    // Send the "Abort" SMS
+                    SendSMS.configureTheSms(MainActivity.this, SendSMS.ABORT_MODE);
+
+                    // Write the event to the DB
+                    EventTypes.addEventToDb(EventTypes.ABORT_SMS_EVENT, MainActivity.this);
+
+                    // Hide the Alert Dialog
                     alertDialog.cancel();
+                } else {
+                    // Clear input fields
+                    username.getText().clear();
+                    password.getText().clear();
+
+                    // Display wrong credentials toast
+                    String toastMessage = getString(R.string.user_confirmation_dialog_wrong_input);
+                    Toast toast = Toast.makeText(MainActivity.this, toastMessage, Toast.LENGTH_SHORT);
+                    if (toast != null) {
+                        toast.cancel();
+                        toast.show();
+                    }
                 }
             }
         });
-
     }
 
     /* ---------------------- ABORT PROCESS ---------------------- */
+
     private void abortCurrentProcess(String currentProcessType) {
         if (currentProcessType.equals(ABORT_AFTER_USER_CLICK_PROCESS)) {
+            // Check for user credentials
             confirmUserInfo();
         } else {
+            EventTypes.addEventToDb(EventTypes.ABORT_SMS_EVENT, this);
             stopTimer();
         }
     }

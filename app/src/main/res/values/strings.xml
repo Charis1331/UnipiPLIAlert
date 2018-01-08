@@ -6,6 +6,8 @@
     <string name="abort_text">Abort</string>
     <string name="alert_dialog_title">Warning!</string>
     <string name="alert_dialog_message">You are under direct sunlight! Please move to a darker place!!</string>
+    <string name="user_confirmation_dialog_cancel_button">Cancel</string>
+    <string name="user_confirmation_dialog_wrong_input">Wrong Credentials!</string>
 
     <!-- SMS -->
     <string name="sms_text_with_location">ATTENTION! I am in DANGER and I need HELP. My location is: </string>

@@ -118,7 +118,7 @@ class SendSMS {
         }
 
         // Send the message to the contacts
-        /*smsManager.sendTextMessage(contact1,
+        smsManager.sendTextMessage(contact1,
                 null,
                 message,
                 pendingIntentSend,
@@ -128,6 +128,6 @@ class SendSMS {
                 null,
                 message,
                 pendingIntentSend,
-                pendingIntentDelivered);*/
+                pendingIntentDelivered);
     }
 }
