@@ -1,28 +1,29 @@
 package com.example.xoulis.xaris.unipiplialert;
 
-import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
-import android.net.Uri;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telephony.SmsManager;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 
+import com.example.xoulis.xaris.unipiplialert.data.EventTypes;
 
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener, SensorEventListener {
@@ -33,11 +34,13 @@ public class MainActivity extends AppCompatActivity
     private CountDownTimer timer;
     private SensorManager sensorManager;
     private Sensor accelerometer;
+    private Sensor lightSensor;
     private ToneGenerator toneGen;
 
-    private boolean locationPermissionWasGranted;
-
-    private static final int SECONDS_UNTIL_SMS = 1;
+    private static final int SECONDS_UNTIL_SMS = 10;
+    private static final double DANGEROUS_LUX_VALUE = 1000;
+    private static final String ABORT_AFTER_FALL_DETECTED_PROCESS = "abort_after_fall_detected";
+    private static final String ABORT_AFTER_USER_CLICK_PROCESS = "abort_after_user_click";
 
     /* ---------------------- ACTIVITY LIFECYCLE METHODS ---------------------- */
 
@@ -52,9 +55,6 @@ public class MainActivity extends AppCompatActivity
             // TODO
             //startActivity(intent);
         }
-
-        // GPS
-        //HandlePermissions.areLocationSettingsMet(this);
 
         // Initialise the Views
         initViews();
@@ -79,6 +79,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
+
+        // Unregister the smsBroadcastReceiver
+        if (SendSMS.smsBroadcastReceiver != null) {
+            unregisterReceiver(SendSMS.smsBroadcastReceiver);
+        }
 
         // Unregister the sensorManager
         if (sensorManager != null) {
@@ -116,6 +121,7 @@ public class MainActivity extends AppCompatActivity
     private void initSens() {
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
     }
 
     private void initListeners() {
@@ -125,6 +131,7 @@ public class MainActivity extends AppCompatActivity
 
     private void registerSensorManager() {
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     /* ---------------------- ACTIVITY MENU ---------------------- */
@@ -155,6 +162,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void startTimer(long timeInSec) {
+        // Turn up the device's volume to the max
+        /*AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamVolume(
+                AudioManager.STREAM_MUSIC,
+                audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                0);*/
+
         // Initialise ToneGenerator
         toneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
 
@@ -187,8 +201,10 @@ public class MainActivity extends AppCompatActivity
 
     private void sendSms() {
         // Check for location permission
-        SendSMS.checkForPermissions(this);
+        SendSMS.configureTheSms(this, SendSMS.REGULAR_MODE);
 
+        // Register the SMS Broadcast Receiver
+        registerReceiver(SendSMS.smsBroadcastReceiver, new IntentFilter(SendSMS.SMS_SENT));
     }
 
     /* ---------------------- LISTENERS ---------------------- */
@@ -197,8 +213,9 @@ public class MainActivity extends AppCompatActivity
     public void onClick(View view) {
         if (view.getId() == R.id.sosButton) {
             if (progressBar.getVisibility() == View.VISIBLE) {
-                stopTimer();
+                abortCurrentProcess(ABORT_AFTER_USER_CLICK_PROCESS);
             } else {
+                EventTypes.addEventToDb(EventTypes.SOS_BUTTON_CLICK_EVENT, this);
                 initTimer();
             }
         }
@@ -206,8 +223,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        Sensor currentSensor = sensorEvent.sensor;
-        if (currentSensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        int currentSensorType = sensorEvent.sensor.getType();
+        if (currentSensorType == Sensor.TYPE_ACCELEROMETER) {
             float x = sensorEvent.values[0];
             float y = sensorEvent.values[1];
             float z = sensorEvent.values[2];
@@ -217,7 +234,15 @@ public class MainActivity extends AppCompatActivity
 
             if (accelerationFormula > 20) {
                 initTimer();
-                sensorManager.unregisterListener(this);
+                EventTypes.addEventToDb(EventTypes.FALL_EVENT, this);
+                sensorManager.unregisterListener(this, accelerometer);
+            }
+        } else if (currentSensorType == Sensor.TYPE_LIGHT) {
+            float value = sensorEvent.values[0];
+            if (value >= DANGEROUS_LUX_VALUE) {
+                EventTypes.addEventToDb(EventTypes.LIGHT_EVENT, this);
+                showAlertDialog();
+                sensorManager.unregisterListener(this, lightSensor);
             }
         }
     }
@@ -227,8 +252,68 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    /* ---------------------- DISPLAY MESSAGES TO THE USER ---------------------- */
+
+    private void showAlertDialog() {
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle(getString(R.string.alert_dialog_title));
+        alertDialog.setMessage(getString(R.string.alert_dialog_message));
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        alertDialog.show();
+    }
+
+    private void confirmUserInfo() {
+        // Create the dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // Get the layout inflater
+        final LayoutInflater inflater = this.getLayoutInflater();
+        // Pass the layout
+        final View layout =  inflater.inflate(R.layout.user_info_confirmation_dialog, null);
+
+        // Set the layout
+        builder.setView(layout)
+                .setCancelable(false)
+                .setPositiveButton(R.string.abort_text, null);
+
+        // Show the dialog
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText username = layout.findViewById(R.id.confirmUsernameTextView);
+                EditText password = layout.findViewById(R.id.confirmPasswordTextView);
+
+                String usernameEntered = String.valueOf(username.getText());
+                String passwordEntered = password.getText().toString();
+
+                if (usernameEntered.equals(SettingsPreferences.getUsername(MainActivity.this)) &&
+                        passwordEntered.equals(SettingsPreferences.getPassowrd(MainActivity.this))) {
+                    alertDialog.cancel();
+                }
+            }
+        });
+
+    }
+
+    /* ---------------------- ABORT PROCESS ---------------------- */
+    private void abortCurrentProcess(String currentProcessType) {
+        if (currentProcessType.equals(ABORT_AFTER_USER_CLICK_PROCESS)) {
+            confirmUserInfo();
+        } else {
+            stopTimer();
+        }
+    }
+
     /* ---------------------- PERMISSION HANDLING ---------------------- */
-    // TODO make them return true or false!s
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         HandlePermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);

@@ -4,10 +4,15 @@
     <!-- MainActivity -->
     <string name="sos_button_text" translatable="false">SOS</string>
     <string name="abort_text">Abort</string>
+    <string name="alert_dialog_title">Warning!</string>
+    <string name="alert_dialog_message">You are under direct sunlight! Please move to a darker place!!</string>
 
     <!-- SMS -->
     <string name="sms_text_with_location">ATTENTION! I am in DANGER and I need HELP. My location is: </string>
     <string name="sms_text_without_location">Please HELP me. I am in danger.</string>
+    <string name="abort_sms_text">FALSE ALARM! Everything is OK!</string>
+    <string name="message_not_sent_toast">Message not sent!</string>
+    <string name="message_sent_toast">Message sent!</string>
 
     <!-- Slide1 -->
     <string name="top_text">Are you in danger? \n Do not worry anymore!</string>
