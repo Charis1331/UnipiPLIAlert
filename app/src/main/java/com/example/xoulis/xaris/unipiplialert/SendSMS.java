@@ -76,6 +76,11 @@ class SendSMS {
                     toast = Toast.makeText(context, messageToShow, Toast.LENGTH_SHORT);
                     toast.show();
                 }
+
+                // Unregister the smsBroadcastReceiver
+                if (SendSMS.smsBroadcastReceiver != null) {
+                    activity.unregisterReceiver(SendSMS.smsBroadcastReceiver);
+                }
             }
         };
     }

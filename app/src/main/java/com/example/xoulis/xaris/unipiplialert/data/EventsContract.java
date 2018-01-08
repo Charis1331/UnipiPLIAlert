@@ -2,10 +2,10 @@ package com.example.xoulis.xaris.unipiplialert.data;
 
 import android.provider.BaseColumns;
 
-public class EventsContract {
-    public class EventsEntry implements BaseColumns {
-        public static final String TABLE_NAME = "events";
-        public static final String COLUMN_TYPE_OF_EVENT = "type_of_event";
-        public static final String COLUMN_TIMESTAMP = "timestamp";
+class EventsContract {
+    class EventsEntry implements BaseColumns {
+        static final String TABLE_NAME = "events";
+        static final String COLUMN_TYPE_OF_EVENT = "type_of_event";
+        static final String COLUMN_TIMESTAMP = "timestamp";
     }
 }

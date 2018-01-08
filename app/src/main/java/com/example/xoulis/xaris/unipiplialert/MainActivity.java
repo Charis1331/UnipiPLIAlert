@@ -11,10 +11,12 @@ import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.CountDownTimer;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,7 +26,10 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.xoulis.xaris.unipiplialert.TTS.MyTts;
 import com.example.xoulis.xaris.unipiplialert.data.EventTypes;
+
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener, SensorEventListener {
@@ -42,12 +47,14 @@ public class MainActivity extends AppCompatActivity
 
     private String currentEmergency = USER_CLICK_EMERGENCY;
 
-    private static final int SECONDS_UNTIL_SMS = 10;
-    private static final double DANGEROUS_LUX_VALUE = 1000;
+    private static final int SECONDS_UNTIL_SMS = 30;
+    private static final double DANGEROUS_LUX_VALUE = 25000;
     private static final String ABORT_AFTER_FALL_DETECTED_PROCESS = "abort_after_fall_detected";
     private static final String ABORT_AFTER_USER_CLICK_PROCESS = "abort_after_user_click";
     private static final String FALL_EMERGENCY = "fall_detected";
     private static final String USER_CLICK_EMERGENCY = "user_clicked_sos_button";
+
+    private MyTts tts;
 
     /* ---------------------- ACTIVITY LIFECYCLE METHODS ---------------------- */
 
@@ -55,6 +62,9 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Initialise TTS obj
+        tts = new MyTts(this);
 
         // Start the Welcome Intro ONLY the first time the app launches
         if (SettingsPreferences.getFirstTimeStart(this)) {
@@ -87,9 +97,10 @@ public class MainActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
 
-        // Unregister the smsBroadcastReceiver
-        if (SendSMS.smsBroadcastReceiver != null) {
-            unregisterReceiver(SendSMS.smsBroadcastReceiver);
+        // Shutdown tts, if it is playing
+        if (tts.isSpeaking()) {
+            tts.stop();
+            tts.shutdown();
         }
 
         // Unregister the sensorManager
@@ -169,6 +180,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void startTimer(long timeInSec) {
+        //obj.speak(getString(R.string.tts_message));
+
         // Turn up the device's volume to the max
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.setStreamVolume(
@@ -179,12 +192,20 @@ public class MainActivity extends AppCompatActivity
         // Initialise ToneGenerator
         toneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
 
-        timer = new CountDownTimer(timeInSec * 1000 + 100, 1000) {
+        timer = new CountDownTimer(timeInSec * 1000 + 200, 1000) {
             @Override
             public void onTick(long l) {
                 int secondsLeft = (int) (l / 1000);
                 progressBar.setProgress(secondsLeft);
-                toneGen.startTone(ToneGenerator.TONE_CDMA_HIGH_L, 150);
+
+                if (secondsLeft >= 25) {
+                    tts.speak(getString(R.string.tts_message));
+                }
+
+                if (secondsLeft < 25) {
+                    tts.shutdown();
+                    toneGen.startTone(ToneGenerator.TONE_CDMA_HIGH_L, 150);
+                }
             }
 
             @Override

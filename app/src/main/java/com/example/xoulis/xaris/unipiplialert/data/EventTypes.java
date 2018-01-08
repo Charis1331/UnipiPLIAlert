@@ -4,7 +4,6 @@ package com.example.xoulis.xaris.unipiplialert.data;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v7.app.AppCompatActivity;
 
 import com.example.xoulis.xaris.unipiplialert.data.EventsContract.EventsEntry;
 

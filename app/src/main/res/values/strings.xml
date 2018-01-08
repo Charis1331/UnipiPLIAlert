@@ -8,6 +8,7 @@
     <string name="alert_dialog_message">You are under direct sunlight! Please move to a darker place!!</string>
     <string name="user_confirmation_dialog_cancel_button">Cancel</string>
     <string name="user_confirmation_dialog_wrong_input">Wrong Credentials!</string>
+    <string name="tts_message" translatable="false">Help me.</string>
 
     <!-- SMS -->
     <string name="sms_text_with_location">ATTENTION! I am in DANGER and I need HELP. My location is: </string>
