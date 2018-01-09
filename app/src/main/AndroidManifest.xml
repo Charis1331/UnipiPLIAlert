@@ -27,8 +27,6 @@
             android:name=".IntroActivity"
             android:theme="@style/IntroActivityTheme" />
 
-        <activity android:name=".SettingsActivity" />
-
         <activity
             android:name=".ChangeContactsActivity"
             android:parentActivityName=".MainActivity">

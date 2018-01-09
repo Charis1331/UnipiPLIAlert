@@ -37,7 +37,7 @@
     <string name="contact_without_country_code_error_message">Insert Country Code and Tel. Number!</string>
 
     <!-- Settings Menu -->
-    <string name="settings_menu_item">Settings</string>
+    <string name="open_source_menu_item" translatable="false">Open Source</string>
     <string name="contacts_menu_item">Contacts</string>
 
     <!-- Contacts Change Activity -->

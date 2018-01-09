@@ -31,6 +31,13 @@ import com.example.xoulis.xaris.unipiplialert.data.EventTypes;
 
 import java.util.Locale;
 
+import de.psdev.licensesdialog.LicensesDialog;
+import de.psdev.licensesdialog.licenses.ApacheSoftwareLicense20;
+import de.psdev.licensesdialog.licenses.CreativeCommonsAttribution30Unported;
+import de.psdev.licensesdialog.licenses.License;
+import de.psdev.licensesdialog.model.Notice;
+import de.psdev.licensesdialog.model.Notices;
+
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener, SensorEventListener {
 
@@ -163,9 +170,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        if (itemId == R.id.action_settings) {
-            Intent settingsIntent = new Intent(this, SettingsActivity.class);
-            startActivity(settingsIntent);
+        if (itemId == R.id.action_open_source) {
+            showOpenSourceLicencesDialog();
             return true;
         } else if (itemId == R.id.action_contacts) {
             Intent contactsIntent = new Intent(this, ChangeContactsActivity.class);
@@ -371,6 +377,35 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+    }
+
+    private void showOpenSourceLicencesDialog() {
+        final Notices notices = new Notices();
+        // AppIntro Library
+        final String name1 = "AppIntro";
+        final String url1 = "https://github.com/apl-devs/AppIntro";
+        final String copyright1 = "Copyright 2015 Paolo Rotolo\nCopyright 2016 Maximilian Narr";
+        final License license1 = new ApacheSoftwareLicense20();
+
+        // LicensesDialog Library
+        final String name2 = "LicensesDialog";
+        final String url2 = "http://psdev.de";
+        final String copyright2 = "Copyright 2013-2017 Philip Schiffer";
+        final License license2 = new ApacheSoftwareLicense20();
+
+        // Icon
+        final String name3 = "Freepik";
+        final String url3 = "https://www.flaticon.com/";
+        final License license3 = new CreativeCommonsAttribution30Unported();
+
+        notices.addNotice(new Notice(name1, url1, copyright1, license1));
+        notices.addNotice(new Notice(name2, url2, copyright2, license2));
+        notices.addNotice(new Notice(name3, url3, null, license3));
+
+        new LicensesDialog.Builder(this)
+                .setNotices(notices)
+                .build()
+                .show();
     }
 
     /* ---------------------- ABORT PROCESS ---------------------- */
