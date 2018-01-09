@@ -28,19 +28,24 @@ public class ChangeContactsActivity extends AppCompatActivity implements TextWat
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_contacts);
 
+        // Find the views
         changeContact1EditText = findViewById(R.id.changeContact1EditText);
         changeContact2EditText = findViewById(R.id.changeContact2EditText);
         saveChangesButton = findViewById(R.id.saveChangesButton);
 
+        // Display the current contacts' tel number
         changeContact1EditText.setText(SettingsPreferences.getContact1(this));
         changeContact2EditText.setText(SettingsPreferences.getContact2(this));
 
+        // Set touch listener to detect any changes
         changeContact1EditText.setOnTouchListener(touchListener);
         changeContact2EditText.setOnTouchListener(touchListener);
 
+        // Add Listener to check input validity
         changeContact1EditText.addTextChangedListener(this);
         changeContact2EditText.addTextChangedListener(this);
 
+        // Handle the button click
         saveChangesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -148,6 +153,7 @@ public class ChangeContactsActivity extends AppCompatActivity implements TextWat
         String temp;
         String newText;
 
+        // Tel number check
         if (editable == changeContact1EditText.getEditableText()) {
             if (changeContact1EditText.getText().length() < 2) {
                 changeContact1EditText.setError(getString(R.string.contact_without_country_code_error_message));

@@ -14,10 +14,12 @@ public class IntroActivity extends AppIntro {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Add the slides
         addSlide(SampleSlide.newInstance(R.layout.slide1));
         addSlide(SampleSlide.newInstance(R.layout.slide2));
         addSlide(SampleSlide.newInstance(R.layout.slide3));
 
+        // Request permissions after 2nd slide
         askForPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.SEND_SMS,
                 Manifest.permission.READ_PHONE_STATE}, 2);
@@ -35,6 +37,7 @@ public class IntroActivity extends AppIntro {
     protected void onPageSelected(int position) {
         super.onPageSelected(position);
 
+        // Handle Slide3 on Slide3.java class
         if (position == 2 && !hasSlide3BeenCreated) {
             setProgressButtonEnabled(false);
             Slide3 obj = new Slide3(this);

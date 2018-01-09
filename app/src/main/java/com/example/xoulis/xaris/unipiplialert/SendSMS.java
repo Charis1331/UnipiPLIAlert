@@ -30,17 +30,22 @@ class SendSMS {
         // Setup the SMS Broadcast Receiver
         setupSmsReceiver(activity);
 
+        // Send SMS for emergency request
         if (mode.equals(REGULAR_MODE)) {
-
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    // Send SMS with location
                     if (HandlePermissions.hasLocationPermissionBeenGranted(activity) &&
                             HandlePermissions.locationSettingsAreMet &&
                             HandlePermissions.haveSmsAndPhoneStatePermissionsBeenGranted(activity)) {
                         sendTheSms(activity, SEND_SMS_WITH_LOCATION);
+
+                        // Send SMS without location
                     } else if (HandlePermissions.haveSmsAndPhoneStatePermissionsBeenGranted(activity)) {
                         sendTheSms(activity, SEND_SMS_WITHOUT_LOCATION);
+
+                        // Send nothing
                     } else {
                         Toast.makeText(activity, "No permissions were granted!", Toast.LENGTH_SHORT).show();
                         activity.finish();
@@ -48,6 +53,7 @@ class SendSMS {
                 }
             }, 5000);
 
+            // Send SMS to abort emergency request
         } else {
             if (HandlePermissions.haveSmsAndPhoneStatePermissionsBeenGranted(activity)) {
                 sendTheSms(activity, ABORT_MODE);
