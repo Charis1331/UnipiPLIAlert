@@ -167,6 +167,10 @@ public class MainActivity extends AppCompatActivity
             Intent settingsIntent = new Intent(this, SettingsActivity.class);
             startActivity(settingsIntent);
             return true;
+        } else if (itemId == R.id.action_contacts) {
+            Intent contactsIntent = new Intent(this, ChangeContactsActivity.class);
+            startActivity(contactsIntent);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

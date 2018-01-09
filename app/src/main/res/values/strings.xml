@@ -38,5 +38,11 @@
 
     <!-- Settings Menu -->
     <string name="settings_menu_item">Settings</string>
+    <string name="contacts_menu_item">Contacts</string>
+
+    <!-- Contacts Change Activity -->
+    <string name="unsaved_changes_dialog_message">You have unsaved changes!</string>
+    <string name="discard">Discard</string>
+    <string name="keep_editing">Stay</string>
 
 </resources>
