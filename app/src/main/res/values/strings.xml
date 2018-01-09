@@ -19,7 +19,8 @@
 
     <!-- Slide1 -->
     <string name="top_text">Are you in danger?   Do not worry anymore!</string>
-    <string name="bottom_text">" <b>UnipiPLIAlert</b> is here for you!! In an emergency,         <b>UnipiPLIAlert</b> will automatically (or manually) call for help."</string>
+    <string name="bottom_text">" <b>UnipiPLIAlert</b> is here for you!! In an emergency,
+        <b>UnipiPLIAlert</b> will automatically (or manually) call for help."</string>
     <string name="image_view_content_description" translatable="false">SOS image</string>
 
     <!-- Slide2 -->

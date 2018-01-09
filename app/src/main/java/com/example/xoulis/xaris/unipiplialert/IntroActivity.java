@@ -36,6 +36,7 @@ public class IntroActivity extends AppIntro {
         super.onPageSelected(position);
 
         if (position == 2 && !hasSlide3BeenCreated) {
+            setProgressButtonEnabled(false);
             Slide3 obj = new Slide3(this);
             obj.configureSlide3();
             hasSlide3BeenCreated = true;

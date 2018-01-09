@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity
     private Button sosButton;
 
     private CountDownTimer timer;
+    private CountDownTimer ttsTimer;
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private Sensor lightSensor;
@@ -116,6 +117,11 @@ public class MainActivity extends AppCompatActivity
             toneGen.release();
         }
 
+        // Cancel the TTS timer
+        if (ttsTimer != null) {
+            ttsTimer.cancel();
+        }
+
         // Stop location updates
         ConfigureGPS.stopLocationUpdates(this);
     }
@@ -123,12 +129,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if (sensorManager != null) {
-            registerSensorManager();
-        }
+        if (!SettingsPreferences.getFirstTimeStart(this)) {
+            if (sensorManager != null) {
+                registerSensorManager();
+            }
 
-        // Start location updates
-        ConfigureGPS.configureFusedLocationClient(this);
+            // Start location updates
+            ConfigureGPS.configureFusedLocationClient(this);
+        }
     }
 
     /* ---------------------- INITIALISATION METHODS ---------------------- */
@@ -185,8 +193,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void startTimer(long timeInSec) {
-        //obj.speak(getString(R.string.tts_message));
-
         // Turn up the device's volume to the max
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.setStreamVolume(
@@ -202,15 +208,7 @@ public class MainActivity extends AppCompatActivity
             public void onTick(long l) {
                 int secondsLeft = (int) (l / 1000);
                 progressBar.setProgress(secondsLeft);
-
-                if (secondsLeft >= 25) {
-                    tts.speak(getString(R.string.tts_message));
-                }
-
-                if (secondsLeft < 25) {
-                    tts.shutdown();
-                    toneGen.startTone(ToneGenerator.TONE_CDMA_HIGH_L, 150);
-                }
+                toneGen.startTone(ToneGenerator.TONE_CDMA_HIGH_L, 150);
             }
 
             @Override
@@ -249,16 +247,38 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.sosButton) {
+            // Help has been requested
             if (progressBar.getVisibility() == View.VISIBLE) {
+                // Help has been requested because of fall detection
                 if (currentEmergency.equals(FALL_EMERGENCY)) {
                     abortCurrentProcess(ABORT_AFTER_FALL_DETECTED_PROCESS);
+
+                    // Helps has been requested because user clicked on the button
                 } else {
                     currentEmergency = USER_CLICK_EMERGENCY;
                     abortCurrentProcess(ABORT_AFTER_USER_CLICK_PROCESS);
                 }
+
+                // Abort current emergency request
             } else {
+                // Write event to DB
                 EventTypes.addEventToDb(EventTypes.SOS_BUTTON_CLICK_EVENT, this);
-                initTimer();
+
+                // Make TTS speak
+                ttsTimer = new CountDownTimer(7 * 1000 + 200, 1000) {
+                    @Override
+                    public void onTick(long l) {
+                        tts.speak(getString(R.string.tts_message));
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        sosButton.setText(getString(R.string.sos_button_text));
+                    }
+                }.start();
+
+                // Send SMS
+                sendSms();
             }
         }
     }
@@ -298,6 +318,7 @@ public class MainActivity extends AppCompatActivity
     /* ---------------------- DISPLAY MESSAGES TO THE USER ---------------------- */
 
     private void showAlertDialog() {
+        // Create and show alert dialog for extreme sunlight
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle(getString(R.string.alert_dialog_title));
         alertDialog.setMessage(getString(R.string.alert_dialog_message));
@@ -313,7 +334,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void confirmUserInfo() {
-        // Create the dialog
+        // Create the dialog to check for user info validity,
+        // in order to abort help request
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         // Get the layout inflater
@@ -347,7 +369,7 @@ public class MainActivity extends AppCompatActivity
                 if (usernameEntered.equals(SettingsPreferences.getUsername(MainActivity.this)) &&
                         passwordEntered.equals(SettingsPreferences.getPassowrd(MainActivity.this))) {
                     // Stop the timer
-                    stopTimer();
+                    ttsTimer.cancel();
 
                     // Send the "Abort" SMS
                     SendSMS.configureTheSms(MainActivity.this, SendSMS.ABORT_MODE);
@@ -406,9 +428,12 @@ public class MainActivity extends AppCompatActivity
     /* ---------------------- ABORT PROCESS ---------------------- */
 
     private void abortCurrentProcess(String currentProcessType) {
+        // If help was requested because of fall detection
         if (currentProcessType.equals(ABORT_AFTER_USER_CLICK_PROCESS)) {
             // Check for user credentials
             confirmUserInfo();
+
+            // If help was requested because user clicked the button
         } else {
             EventTypes.addEventToDb(EventTypes.ABORT_SMS_EVENT, this);
             stopTimer();
