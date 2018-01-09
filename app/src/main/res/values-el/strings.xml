@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">UnipiPLIAlert</string>
+    <string name="abort_text">Ακύρωση</string>
+    <string name="alert_dialog_title">Προσοχή!</string>
+    <string name="alert_dialog_message">Επικίνδυνη ηλιακή ακτινοβολία! Βρείτε ένα σκιερό μέρος!!</string>
+    <string name="user_confirmation_dialog_cancel_button">Ακύρωση</string>
+    <string name="user_confirmation_dialog_wrong_input">Λάθος Στοιχεία!</string>
+    <string name="sms_text_with_location">"ΠΡΟΣΟΧΉ! Είμαι σε ΚΙΝΔΥΝΟ και χρειάζομαι ΒΟΗΘΕΙΑ. Η τοποθεσία μου είναι: "</string>
+    <string name="sms_text_without_location">Παρακαλώ ΒΟΗΘΗΣΤΕ με. Βρίσκομαι σε κίνδυο.</string>
+    <string name="abort_sms_text">ΛΑΘΟΣ ΣΥΝΑΓΕΡΜΟΣ! Όλα είναι ύπο ελέγχο!</string>
+    <string name="message_not_sent_toast">Αδυναμία αποστολής μηνύματος!</string>
+    <string name="message_sent_toast">Επιτυχής αποστολή μηνύματος!</string>
+    <string name="top_text">Βρίσκεστε σε κίνδυνο; Μην ανησυχείτε πια!</string>
+    <string name="bottom_text">Το <b>UnipiPLIAlert</b> είναι εδώ για εσάς. Το <b>UnipiPLIAlert</b> θα καλέσει αυτόματα (ή χειροκίνητα) για βοήθεια.</string>
+    <string name="slide2_title">Χρειαζόμαστε αυτές τις <b>3</b> εξουσιοδοτήσεις...</string>
+    <string name="slide2_location"><b>Άδεια Τοποθεσίας</b>: για την πρόσβαση στην τοποθεσία σας και την έγκαιρη κλήση βοήθειας.</string>
+    <string name="slide2_sms"><b>Άδεια SMS</b>: για την αποστολή SMS στις επιλεγμένες επαφές σας, όταν είστε σε κίνδυνο.</string>
+    <string name="slide2_phone"><b>Άδεια Τηλεφώνου</b>: για την επεξεργασία των τηλεφωνικών αριθμών των επαφών σας και ύστερα στην αποστολή του SMS.</string>
+    <string name="username_hint_text_input">Όνομα</string>
+    <string name="password_hint_text_input">Κωδικός</string>
+    <string name="contact1_hint">Επαφή #1</string>
+    <string name="save_button_text">Αποθήκευση</string>
+    <string name="contact2_hint">Επαφή #2</string>
+    <string name="username_text_input_layout_error_message">Το όνομα πρέπει να είναι τουλάχιστον 4 χαρακτήρων!</string>
+    <string name="password_text_input_layout_error_message">Ο κωδικός πρέπει να είναι τουλάχιστον 4 χαρακτήρων!</string>
+    <string name="contact_without_country_code_error_message">Εισάγετε κωδικό χώρας και τηλ.!</string>
+    <string name="contacts_menu_item">Επαφές</string>
+    <string name="unsaved_changes_dialog_message">Έχετε μη αποθηκευμένες αλλαγές!</string>
+    <string name="keep_editing">Μείνε</string>
+    <string name="discard">Απόρριψη</string>
+</resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">UnipiPLIAlert</string>
+    <string name="abort_text">Αbortar</string>
+    <string name="alert_dialog_title">Alarma!</string>
+    <string name="alert_dialog_message">¡Estás bajo la luz solar directa! ¡Por favor, muévanse a un lugar más oscuro!</string>
+    <string name="user_confirmation_dialog_cancel_button">Cancelar</string>
+    <string name="sms_text_with_location">¡ATENCIÓN! Estoy en PELIGRO y necesito AYUDA. Mi ubicación es:</string>
+    <string name="user_confirmation_dialog_wrong_input">¡Credenciales incorrectas!</string>
+    <string name="sms_text_without_location">Por favor, ayúdame. Estoy en peligro</string>
+    <string name="abort_sms_text">¡FALSA ALARMA! ¡Todo está bien!</string>
+    <string name="message_not_sent_toast">Mensaje no enviado!</string>
+    <string name="message_sent_toast">¡Mensaje enviado!</string>
+    <string name="top_text">¿Estás en peligro? ¡No te preocupes más!</string>
+    <string name="bottom_text"><b>UnipiPLIAlert</b> está aquí para usted! En una emergencia, <b>UnipiPLIAlert</b> llamará automáticamente (o manualmente) para pedir ayuda.</string>
+    <string name="slide2_title">Necesitamos estos <b>3</b> permisos de usted ...</string>
+    <string name="slide2_location"><b>Permiso de ubicación</b>: para acceder a su ubicación y enviar ayuda en caso de emergencia.</string>
+    <string name="slide2_sms"><b>Permiso de SMS</b>: para enviar un mensaje de texto a tus contactos favoritos, en el momento en que estés en peligro.</string>
+    <string name="slide2_phone"><b>Permiso del teléfono</b>: para procesar los números de tus contactos y luego enviar los SMS apropiados.</string>
+    <string name="username_hint_text_input">nombre</string>
+    <string name="password_hint_text_input">contraseña</string>
+    <string name="save_button_text">salvar</string>
+    <string name="contact1_hint">Contacto #1</string>
+    <string name="contact2_hint">Contacto #2</string>
+    <string name="username_text_input_layout_error_message">¡El nombre debe tener al menos 4 caracteres!</string>
+    <string name="password_text_input_layout_error_message">La contraseña debe tener al menos 4 caracteres.</string>
+    <string name="contact_without_country_code_error_message">Inserte el código de país y tel. ¡Número!</string>
+    <string name="contacts_menu_item">Contactos</string>
+    <string name="unsaved_changes_dialog_message">¡Tiene cambios sin guardar!</string>
+    <string name="discard">Descarte</string>
+    <string name="keep_editing">Permanecer</string>
+</resources>
