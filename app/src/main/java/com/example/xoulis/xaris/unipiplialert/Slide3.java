@@ -99,8 +99,8 @@ public class Slide3 implements TextWatcher, View.OnClickListener {
                 contact1EditText.setSelection(1);
             }
         } else if (viewId == R.id.saveButton) {
-            // TODO Don't display welcome intro again
-            //SettingsPreferences.setFirstTimeStart(activity);
+            // Don't display welcome intro again
+            SettingsPreferences.setFirstTimeStart(activity);
 
             // Save input
             saveUserInfo();

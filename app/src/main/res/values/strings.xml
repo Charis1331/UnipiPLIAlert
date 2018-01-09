@@ -23,6 +23,15 @@
         <b>UnipiPLIAlert</b> will automatically (or manually) call for help.</string>
     <string name="image_view_content_description">SOS image</string>
 
+    <!-- Slide2 -->
+    <string name="slide2_title">We need these <b>3</b> permissions from you…</string>
+    <string name="slide2_location"><b>Location Permission</b>: in order to access your location and send
+    help in case of an emergency.</string>
+    <string name="slide2_sms"><b>SMS Permission</b>: so as to send an SMS to your favourite contacts, the
+    moment you are in danger.</string>
+    <string name="slide2_phone"><b>Phone Permission</b>: in order to process your contacts\' numbers and then
+    send the appropriate SMS.</string>
+
     <!-- Slide3 -->
     <string name="slide3_title">UnipiPLIAlert</string>
     <string name="username_hint_text_input">Username</string>

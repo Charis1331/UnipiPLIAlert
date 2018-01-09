@@ -11,12 +11,10 @@ import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.CountDownTimer;
-import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,8 +26,6 @@ import android.widget.Toast;
 
 import com.example.xoulis.xaris.unipiplialert.TTS.MyTts;
 import com.example.xoulis.xaris.unipiplialert.data.EventTypes;
-
-import java.util.Locale;
 
 import de.psdev.licensesdialog.LicensesDialog;
 import de.psdev.licensesdialog.licenses.ApacheSoftwareLicense20;
@@ -76,8 +72,7 @@ public class MainActivity extends AppCompatActivity
         // Start the Welcome Intro ONLY the first time the app launches
         if (SettingsPreferences.getFirstTimeStart(this)) {
             Intent intent = new Intent(this, IntroActivity.class);
-            // TODO
-            //startActivity(intent);
+            startActivity(intent);
         }
 
         // Initialise the Views

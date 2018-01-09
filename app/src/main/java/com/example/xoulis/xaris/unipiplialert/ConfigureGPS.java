@@ -56,7 +56,6 @@ class ConfigureGPS {
     private static void setupLocationRequest() {
         locationRequest = new LocationRequest();
         locationRequest.setInterval(LOCATION_UPDATE_INTERVAL_IN_SECONDS);
-        //locationRequest.setNumUpdates(1);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
     }
 
