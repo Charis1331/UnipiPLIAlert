@@ -13,7 +13,7 @@
     <string name="message_sent_toast">Επιτυχής αποστολή μηνύματος!</string>
     <string name="top_text">Βρίσκεστε σε κίνδυνο; Μην ανησυχείτε πια!</string>
     <string name="bottom_text">Το <b>UnipiPLIAlert</b> είναι εδώ για εσάς. Το <b>UnipiPLIAlert</b> θα καλέσει αυτόματα (ή χειροκίνητα) για βοήθεια.</string>
-    <string name="slide2_title">Χρειαζόμαστε αυτές τις <b>3</b> εξουσιοδοτήσεις...</string>
+    <string name="slide2_title">Χρειαζόμαστε αυτές τις <b>3</b> εξουσιοδοτήσεις…</string>
     <string name="slide2_location"><b>Άδεια Τοποθεσίας</b>: για την πρόσβαση στην τοποθεσία σας και την έγκαιρη κλήση βοήθειας.</string>
     <string name="slide2_sms"><b>Άδεια SMS</b>: για την αποστολή SMS στις επιλεγμένες επαφές σας, όταν είστε σε κίνδυνο.</string>
     <string name="slide2_phone"><b>Άδεια Τηλεφώνου</b>: για την επεξεργασία των τηλεφωνικών αριθμών των επαφών σας και ύστερα στην αποστολή του SMS.</string>

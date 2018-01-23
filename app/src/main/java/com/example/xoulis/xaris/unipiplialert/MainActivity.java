@@ -99,31 +99,36 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
+        if (!SettingsPreferences.getFirstTimeStart(this)) {
+            // Shutdown tts, if it is playing
+            if (tts.isSpeaking()) {
+                tts.stop();
+                tts.shutdown();
+            }
 
-        // Shutdown tts, if it is playing
-        if (tts.isSpeaking()) {
-            tts.stop();
-            tts.shutdown();
+            // Unregister the sensorManager
+            if (sensorManager != null) {
+                sensorManager.unregisterListener(this);
+            }
+
+            // Cancel the timer and release the ToneGenerator
+            if (timer != null) {
+                stopTimer();
+            }
+
+            // Cancel the TTS timer
+            if (ttsTimer != null) {
+                ttsTimer.cancel();
+            }
+
+            // Stop location updates
+            ConfigureGPS.stopLocationUpdates(this);
+
+            // Release resources of toneGen
+            if (toneGen != null) {
+                toneGen.release();
+            }
         }
-
-        // Unregister the sensorManager
-        if (sensorManager != null) {
-            sensorManager.unregisterListener(this);
-        }
-
-        // Cancel the timer and release the ToneGenerator
-        if (timer != null) {
-            stopTimer();
-            toneGen.release();
-        }
-
-        // Cancel the TTS timer
-        if (ttsTimer != null) {
-            ttsTimer.cancel();
-        }
-
-        // Stop location updates
-        ConfigureGPS.stopLocationUpdates(this);
     }
 
     @Override
